@@ -16,4 +16,4 @@ jobs:
         run: echo Hello, world!
 
       - name: Run script
-        run: python image_scrapper.py
+        run: python modules/image_scrapper.py
