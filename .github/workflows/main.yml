@@ -11,10 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
-
-      - name: Install Python
-        run: echo Hello, world!
-      - name: Check dir
-        run: ls
+        
       - name: Run script
-        run: python ./modules/image_scrapper.py
+        run: |
+          cd modules,
+          python modules/image_scrapper.py
