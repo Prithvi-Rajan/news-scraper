@@ -14,6 +14,7 @@ jobs:
 
       - name: Install Python
         run: echo Hello, world!
-
+      - name: Check dir
+        run: ls
       - name: Run script
-        run: python modules/image_scrapper.py
+        run: python ./modules/image_scrapper.py
