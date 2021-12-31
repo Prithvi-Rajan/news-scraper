@@ -6,16 +6,14 @@ import os
 
 
 class OCR:
-    def get_text(self, urls, words_list):
+    def _get_text(self, image, words_list):
         pytesseract.pytesseract.tesseract_cmd = r'C:/Program Files/Tesseract-OCR/tesseract.exe'
-        for idx, url in enumerate(urls):
-            im = Image.open(BytesIO(urlopen(url).read()))
-            im = im.convert('RGB')
-            im.save('./temp/{idx}.jpg')
-            self.text = pytesseract.image_to_string(im, lang='tam')
-            os.remove('./temp/{idx}.jpg')
-            self.text_words = self.text.split(' ')
-            return self._get_words(words_list)
+        image = image.convert('RGB')
+        image.save('./temp/image.png')
+        self.text = pytesseract.image_to_string(image, lang='tam')
+        os.remove('./temp/image.png')
+        self.text_words = self.text.split(' ')
+        return self._get_words(words_list)
 
     def _get_words(self, words_list):
         hit = True
@@ -25,9 +23,9 @@ class OCR:
                 break
         return hit
 
-    def check_for_shutdown(self, urls):
+    def check_for_shutdown(self, image):
         words = ['பொள்ளாச்சி', 'மின்தடை']
-        return self.get_text(urls, words)
+        return self._get_text(image, words)
 
 
 # def main():

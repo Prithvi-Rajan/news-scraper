@@ -4,10 +4,12 @@ import modules.image_scraper as image_scraper
 
 
 def main():
-    url = 'https://epaper.dinakaran.com/3333692/Pollachi-Coimbatore-Supplement/29-12-2021#page/2/1'
-    scraper = image_scraper.ImageScraper(url)
+    scraper = image_scraper.ImageScraper()
     ocr = OCR.OCR()
-    ocr.check_for_shutdown(scraper.images)
+    if ocr.check_for_shutdown(scraper.get_newspaper_image()):
+        print('found')
+    else:
+        print('not found')
 
 
 if __name__ == '__main__':

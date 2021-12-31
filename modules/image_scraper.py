@@ -4,25 +4,43 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import datetime
 import time
-import OCR
+from PIL import Image
+from io import BytesIO
+from urllib.request import urlopen
+# import OCR
 # import requests
 # import re
 
 
 class ImageScraper:
-    def __init__(self, url):
+    def __init__(self):
         self.clip_urls = []
         self.chunks = []
         self.options = Options()
-        # self.options.headless = True
-        self.getLastNewsPaperPage(url)
-        self.create_images()
+        self.options.headless = True
+        self.newspaper_image = None
+        url = 'https://epaper.dinakaran.com/t/22485'
+        self._getLastNewsPaperPage(url)
+        self._create_images()
         self._get_chunks()
+        self._concat_images()
 
     def _concat_images(self):
-        pass
+        width, height = 700, 744
+        new_image = Image.new('RGB', (width * 2, height * 3))
+        paste_height = 0
+        for url in self.chunks[:3]:
+            im = Image.open(BytesIO(urlopen(url).read()))
+            new_image.paste(im, (0, paste_height))
+            paste_height += height
+        paste_height = 0
+        for url in self.chunks[3:]:
+            im = Image.open(BytesIO(urlopen(url).read()))
+            new_image.paste(im, (width, paste_height))
+            paste_height += height
+        self.newspaper_image = new_image
 
-    def get_clips(self, class_name):
+    def _get_clips(self, class_name):
         base_url = 'https://epaper.dinakaran.com/3333692/Pollachi-Coimbatore-Supplement/28-12-2021'
         clips = []
         for div in self.soup.find_all('div', class_=class_name):
@@ -33,10 +51,9 @@ class ImageScraper:
     def _get_chunks(self):
         for chunk_number in range(6):
             chunk = self.soup.find(id=f'left-chunk-{chunk_number}')
-            print(chunk)
             self.chunks.append(chunk.find_all('img')[0].get('src'))
 
-    def getLastNewsPaperPage(self, url):
+    def _getLastNewsPaperPage(self, url):
         driver = webdriver.Chrome(
             executable_path=r"C:\\chromedriver.exe", options=self.options)
         driver.get(url)
@@ -49,8 +66,10 @@ class ImageScraper:
         id = redirect_url.split('/')[-1]
         current_date = datetime.datetime.now().strftime("%d-%m-%Y")
         self.url = f'https://epaper.dinakaran.com/{id}/Pollachi-Coimbatore-Supplement/{current_date}#page/2/2'
+        # this url has shutdown text
+        # self.url = f'https://epaper.dinakaran.com/3333692/Pollachi-Coimbatore-Supplement/28-12-2021#page/2/2'
 
-    def create_images(self):
+    def _create_images(self):
         self.driver = webdriver.Chrome(
             executable_path=r"C:\\chromedriver.exe", options=self.options)
         self.driver.get(self.url)
@@ -63,12 +82,14 @@ class ImageScraper:
         time.sleep(3)
         self.soup = BeautifulSoup(self.driver.page_source, 'html.parser')
 
-
-def main():
-    url = 'https://epaper.dinakaran.com/t/22485'
-    scraper = ImageScraper(url)
-    print(scraper.images)
+    def get_newspaper_image(self):
+        return self.newspaper_image
 
 
-if __name__ == '__main__':
-    main()
+# def main():
+#     scraper = ImageScraper()
+#     print(scraper.images)
+
+
+# if __name__ == '__main__':
+#     main()
