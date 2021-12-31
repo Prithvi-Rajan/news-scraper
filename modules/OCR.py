@@ -3,15 +3,17 @@ from PIL import Image
 from io import BytesIO
 from urllib.request import urlopen
 import os
+import datetime
 
 
 class OCR:
     def _get_text(self, image, words_list):
         pytesseract.pytesseract.tesseract_cmd = r'C:/Program Files/Tesseract-OCR/tesseract.exe'
         image = image.convert('RGB')
-        image.save('./temp/image.png')
+        current_date = datetime.datetime.now().strftime("%d-%m-%Y")
+        image.save(f'./temp/{current_date}.png')
         self.text = pytesseract.image_to_string(image, lang='tam')
-        os.remove('./temp/image.png')
+        # os.remove(f'./temp/{current_date}.png')
         self.text_words = self.text.split(' ')
         return self._get_words(words_list)
 
